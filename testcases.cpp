@@ -224,7 +224,7 @@ TEST(LibraryTest, DisplayTotalBooks) {
     library.addBook(b1);
     library.addBook(b2);
 
-    int totalBooks = library.totalBooks();
+    int totalBooks = library.displayTotalBooks();
     ASSERT_EQ(totalBooks, 2);
 }
 
