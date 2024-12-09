@@ -14,7 +14,7 @@ class Book:
         print("{:<20}{:<20}{:<15}{:<10}{:<10.2f}".format(self.title, self.author, self.isbn, self.year, self.price))
 
     def save_to_file(self, file):
-        file.write(f"{self.title}\n{self.author}\n{self.isbn}\n{self.year}\n{self.price}\n")
+        file.write("{}\n{}\n{}\n{}\n{}\n".format(self.title, self.author, self.isbn, self.year, self.price))
 
     @staticmethod
     def load_from_file(file):
