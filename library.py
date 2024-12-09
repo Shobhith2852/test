@@ -11,7 +11,7 @@ class Book:
         self.price = price
 
     def display(self):
-        print(f"{self.title:<20}{self.author:<20}{self.isbn:<15}{self.year:<10}{self.price:<10.2f}")
+        print("{:<20}{:<20}{:<15}{:<10}{:<10.2f}".format(self.title, self.author, self.isbn, self.year, self.price))
 
     def save_to_file(self, file):
         file.write(f"{self.title}\n{self.author}\n{self.isbn}\n{self.year}\n{self.price}\n")
