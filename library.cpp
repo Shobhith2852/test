@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <limits>
 #include <sstream>  // For stringstream manipulation
+#include <optional>
+
 
 using namespace std;
 
@@ -17,6 +19,9 @@ public:
     string isbn;
     int year;
     double price;
+     
+    // Default constructor
+    Book() : title(""), author(""), isbn(""), year(0), price(0.0) {}
 
     // Constructor
     Book(string t, string a, string i, int y, double p)
