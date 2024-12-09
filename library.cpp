@@ -165,18 +165,20 @@ public:
         cout << "All books have been removed from the library!" << endl;
     }
 
-    // Display book by ISBN
-    void displayBookByISBN(const string &isbn) const {
-        auto it = find_if(books.begin(), books.end(), [&](const Book &book) {
-            return book.isbn == isbn;
-        });
+Book displayBookByISBN(const string &isbn) const {
+    auto it = find_if(books.begin(), books.end(), [&](const Book &book) {
+        return book.isbn == isbn;
+    });
 
-        if (it != books.end()) {
-            it->display();
-        } else {
-            cout << "Book not found!" << endl;
-        }
+    if (it != books.end()) {
+        it->display();  // Still print the book details
+        return *it;     // Return the found book
+    } else {
+        cout << "Book not found!" << endl;
+        return Book();  // Return a default Book object if not found
     }
+}
+
 
     // Update book details
     void updateBookDetails(const string &isbn) {
