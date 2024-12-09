@@ -178,7 +178,14 @@ int main() {
 
         int choice;
         cin >> choice;
-        cin.ignore();  // to ignore the newline character after the choice
+
+        // Handle invalid input
+        if (cin.fail()) {
+            cin.clear(); // Clear error flag
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+            cout << "Invalid input. Please enter a number between 1 and 10.\n";
+            continue; // Ask for the choice again
+        }
 
         if (choice == 1) {
             // Add a new book
@@ -187,6 +194,7 @@ int main() {
             double price;
 
             cout << "Enter book title: ";
+            cin.ignore(); // To ignore the leftover newline
             getline(cin, title);
             cout << "Enter book author: ";
             getline(cin, author);
@@ -205,6 +213,7 @@ int main() {
             // Remove a book by ISBN
             string isbn;
             cout << "Enter ISBN of the book to remove: ";
+            cin.ignore(); // To ignore the leftover newline
             getline(cin, isbn);
 
             library.removeBook(isbn);
