@@ -52,18 +52,28 @@ class TestLibraryManagement(unittest.TestCase):
         self.assertEqual(book.title, "Title1")
 
     def test_update_book_details(self):
-        self.library.update_book_details("ISBN1")  # Corrected method name
-        updated_book = self.library.display_book_by_isbn("ISBN1")  # Corrected method name
-        self.assertIsNotNone(updated_book)
-        self.assertEqual(updated_book.title, "Updated Title")
+        # Create a new Book object with updated details
+        updated_book = Book("Updated Title", "Updated Author", "ISBN1", 2023, 25.99)
+        
+        # Call update_book_details and pass the updated_book
+        self.library.update_book_details("ISBN1", updated_book)
+        
+        # Get the updated book and verify the changes
+        updated_book_from_library = self.library.display_book_by_isbn("ISBN1")
+        self.assertIsNotNone(updated_book_from_library)
+        self.assertEqual(updated_book_from_library.title, "Updated Title")
+        self.assertEqual(updated_book_from_library.author, "Updated Author")
+        self.assertEqual(updated_book_from_library.year, 2023)
+        self.assertEqual(updated_book_from_library.price, 25.99)
+
 
     def test_load_and_save_books(self):
         filename = "test_books.txt"
         # Create and write data to a file for testing
         with open(filename, "w") as file:
-            file.write("Title1\nAuthor1\nISBN1\n2020\n15.99\n")
-            file.write("Title2\nAuthor2\nISBN2\n2021\n10.99\n")
-            file.write("Another Title\nAuthor1\nISBN3\n2019\n20.99\n")
+            file.write("Title10\nAuthor10\nISBN10\n2020\n15.99\n")
+            file.write("Title20\nAuthor20\nISBN20\n2021\n10.99\n")
+            file.write("Another Title1\nAuthor11\nISBN31\n2019\n20.99\n")
         
         new_library = Library()
         new_library.load_books_from_file(filename)  # Corrected method name
