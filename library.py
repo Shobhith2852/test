@@ -88,25 +88,25 @@ class Library:
         else:
             print("Book not found!")
             return None
-
-def update_book_details(self, isbn: str, new_book: Optional[Book] = None):
-    book = next((b for b in self.books if b.isbn == isbn), None)
-    if book:
-        if new_book:
-            # Update book with new_book details
-            book.title = new_book.title
-            book.author = new_book.author
-            book.year = new_book.year
-            book.price = new_book.price
+    
+    def update_book_details(self, isbn: str, new_book: Optional[Book] = None):
+        book = next((b for b in self.books if b.isbn == isbn), None)
+        if book:
+            if new_book:
+                # Update book with new_book details
+                book.title = new_book.title
+                book.author = new_book.author
+                book.year = new_book.year
+                book.price = new_book.price
+            else:
+                # Otherwise, prompt for user input
+                book.title = input(f"Enter new title (current: {book.title}): ") or book.title
+                book.author = input(f"Enter new author (current: {book.author}): ") or book.author
+                book.year = int(input(f"Enter new year (current: {book.year}): ") or book.year)
+                book.price = float(input(f"Enter new price (current: {book.price}): ") or book.price)
+            print("Book details updated successfully!")
         else:
-            # Otherwise, prompt for user input
-            book.title = input(f"Enter new title (current: {book.title}): ") or book.title
-            book.author = input(f"Enter new author (current: {book.author}): ") or book.author
-            book.year = int(input(f"Enter new year (current: {book.year}): ") or book.year)
-            book.price = float(input(f"Enter new price (current: {book.price}): ") or book.price)
-        print("Book details updated successfully!")
-    else:
-        print("Book not found!")
+            print("Book not found!")
 
 
 # Display the main menu options
