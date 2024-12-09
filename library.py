@@ -28,7 +28,8 @@ class Book:
 # Class to handle the library system
 class Library:
     def __init__(self):
-        self.books: List[Book] = []
+        self.books = []  # List of Book objects
+
 
     def add_book(self, book: Book):
         self.books.append(book)
