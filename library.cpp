@@ -4,8 +4,8 @@
 #include <vector>
 #include <algorithm>
 #include <iomanip>
-#include <limits> // For std::numeric_limits
-#include <ctime> // For fine calculation
+#include <limits>
+#include <sstream>  // For stringstream manipulation
 
 using namespace std;
 
@@ -17,12 +17,10 @@ public:
     string isbn;
     int year;
     double price;
-    bool isAvailable;
-    string genre;
 
     // Constructor
-    Book(string t, string a, string i, int y, double p, string g)
-        : title(t), author(a), isbn(i), year(y), price(p), isAvailable(true), genre(g) {}
+    Book(string t, string a, string i, int y, double p)
+        : title(t), author(a), isbn(i), year(y), price(p) {}
 
     // Display Book information
     void display() const {
@@ -30,32 +28,27 @@ public:
              << setw(20) << author
              << setw(15) << isbn
              << setw(10) << year
-             << setw(10) << price
-             << setw(10) << (isAvailable ? "Available" : "Not Available")
-             << setw(10) << genre << endl;
+             << setw(10) << price << endl;
     }
 
     // Save book data to a file
     void saveToFile(ofstream &file) const {
-        file << title << "\n" << author << "\n" << isbn << "\n" << year << "\n" << price << "\n"
-             << isAvailable << "\n" << genre << "\n";
+        file << title << "\n" << author << "\n" << isbn << "\n" << year << "\n" << price << "\n";
     }
 
     // Load book data from file
     static Book loadFromFile(ifstream &file) {
-        string t, a, i, g;
+        string t, a, i;
         int y;
         double p;
-        bool available;
 
         getline(file, t);
         getline(file, a);
         getline(file, i);
-        file >> y >> p >> available;
+        file >> y >> p;
         file.ignore(); // To consume the newline character
-        getline(file, g);
 
-        return Book(t, a, i, y, p, g);
+        return Book(t, a, i, y, p);
     }
 };
 
@@ -106,17 +99,6 @@ public:
         return result;
     }
 
-    // Search books by genre
-    vector<Book> searchByGenre(const string &genre) const {
-        vector<Book> result;
-        for (const auto &book : books) {
-            if (book.genre.find(genre) != string::npos) {
-                result.push_back(book);
-            }
-        }
-        return result;
-    }
-
     // Sort books by price (ascending)
     void sortByPrice() {
         sort(books.begin(), books.end(), [](const Book &a, const Book &b) {
@@ -131,29 +113,13 @@ public:
         });
     }
 
-    // Sort books by title (ascending)
-    void sortByTitle() {
-        sort(books.begin(), books.end(), [](const Book &a, const Book &b) {
-            return a.title < b.title;
-        });
-    }
-
-    // Sort books by author (ascending)
-    void sortByAuthor() {
-        sort(books.begin(), books.end(), [](const Book &a, const Book &b) {
-            return a.author < b.author;
-        });
-    }
-
     // Display all books
     void displayAllBooks() const {
         cout << left << setw(20) << "Title"
              << setw(20) << "Author"
              << setw(15) << "ISBN"
              << setw(10) << "Year"
-             << setw(10) << "Price"
-             << setw(10) << "Availability"
-             << setw(10) << "Genre" << endl;
+             << setw(10) << "Price" << endl;
 
         for (const auto &book : books) {
             book.display();
@@ -187,46 +153,16 @@ public:
         }
         file.close();
     }
-};
 
-// Class to handle users
-class User {
-public:
-    string name;
-    vector<Book*> borrowedBooks;
-    static const int maxBorrowLimit = 5;
-
-    // Constructor
-    User(string n) : name(n) {}
-
-    // Borrow a book
-    bool borrowBook(Book &book) {
-        if (borrowedBooks.size() < maxBorrowLimit && book.isAvailable) {
-            borrowedBooks.push_back(&book);
-            book.isAvailable = false;
-            cout << name << " borrowed the book: " << book.title << endl;
-            return true;
-        }
-        cout << "Cannot borrow more books or book is unavailable." << endl;
-        return false;
+    // Display total number of books in the library
+    void displayTotalBooks() const {
+        cout << "Total books in the library: " << books.size() << endl;
     }
 
-    // Return a book
-    void returnBook(Book &book) {
-        auto it = find(borrowedBooks.begin(), borrowedBooks.end(), &book);
-        if (it != borrowedBooks.end()) {
-            borrowedBooks.erase(it);
-            book.isAvailable = true;
-            cout << name << " returned the book: " << book.title << endl;
-        }
-    }
-
-    // List all borrowed books
-    void listBorrowedBooks() const {
-        cout << name << "'s Borrowed Books:" << endl;
-        for (const auto &book : borrowedBooks) {
-            cout << book->title << endl;
-        }
+    // Clear all books from the library
+    void clearBooks() {
+        books.clear();
+        cout << "All books have been removed from the library!" << endl;
     }
 };
 
@@ -237,38 +173,51 @@ void displayMenu() {
     cout << "2. Remove a book\n";
     cout << "3. Search books by title\n";
     cout << "4. Search books by author\n";
-    cout << "5. Search books by genre\n";
-    cout << "6. Display all books\n";
-    cout << "7. Sort books by price\n";
-    cout << "8. Sort books by year\n";
-    cout << "9. Sort books by title\n";
-    cout << "10. Sort books by author\n";
-    cout << "11. Load books from file\n";
-    cout << "12. Save books to file\n";
-    cout << "13. Borrow a book\n";
-    cout << "14. Return a book\n";
-    cout << "15. Exit\n";
+    cout << "5. Display all books\n";
+    cout << "6. Sort books by price\n";
+    cout << "7. Sort books by year\n";
+    cout << "8. Load books from file\n";
+    cout << "9. Save books to file\n";
+    cout << "10. Display total books\n";
+    cout << "11. Clear all books\n";
+    cout << "12. Exit\n";
     cout << "Enter your choice: ";
+}
+
+// Function to get valid integer input
+int getValidIntegerInput() {
+    int choice;
+    while (true) {
+        cin >> choice;
+
+        if (cin.fail()) { // Check if the input is invalid
+            cin.clear(); // Clear the error state
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore invalid characters
+            cout << "Invalid input. Please enter a number between 1 and 12.\n";
+        } else if (choice < 1 || choice > 12) {
+            cout << "Invalid choice. Please enter a number between 1 and 12.\n";
+        } else {
+            break; // Valid input, break out of the loop
+        }
+    }
+    return choice;
 }
 
 // Main function for library management
 int main() {
     Library library;
-    User user1("Alice");
     int choice;
-
-    // Preload some books for testing
-    library.addBook(Book("The Great Gatsby", "F. Scott Fitzgerald", "9780743273565", 1925, 10.99, "Classic"));
-    library.addBook(Book("1984", "George Orwell", "9780451524935", 1949, 8.99, "Dystopian"));
 
     while (true) {
         displayMenu();
-        cin >> choice;
+        choice = getValidIntegerInput(); // Get valid choice input
 
         if (choice == 1) {
-            string title, author, isbn, genre;
+            // Add a new book
+            string title, author, isbn;
             int year;
             double price;
+
             cout << "Enter book title: ";
             cin.ignore(); // To ignore the leftover newline
             getline(cin, title);
@@ -280,23 +229,26 @@ int main() {
             cin >> year;
             cout << "Enter book price: ";
             cin >> price;
-            cout << "Enter book genre: ";
-            cin.ignore(); // To ignore the leftover newline
-            getline(cin, genre);
-            library.addBook(Book(title, author, isbn, year, price, genre));
+            cin.ignore();
+
+            library.addBook(Book(title, author, isbn, year, price));
             cout << "Book added successfully!" << endl;
 
         } else if (choice == 2) {
+            // Remove a book by ISBN
             string isbn;
             cout << "Enter ISBN of the book to remove: ";
-            cin.ignore();
+            cin.ignore(); // To ignore the leftover newline
             getline(cin, isbn);
+
             library.removeBook(isbn);
 
         } else if (choice == 3) {
+            // Search books by title
             string title;
             cout << "Enter title to search for: ";
             getline(cin, title);
+
             auto foundBooks = library.searchByTitle(title);
             if (foundBooks.empty()) {
                 cout << "No books found with that title." << endl;
@@ -307,9 +259,11 @@ int main() {
             }
 
         } else if (choice == 4) {
+            // Search books by author
             string author;
             cout << "Enter author to search for: ";
             getline(cin, author);
+
             auto foundBooks = library.searchByAuthor(author);
             if (foundBooks.empty()) {
                 cout << "No books found by that author." << endl;
@@ -320,60 +274,48 @@ int main() {
             }
 
         } else if (choice == 5) {
-            string genre;
-            cout << "Enter genre to search for: ";
-            getline(cin, genre);
-            auto foundBooks = library.searchByGenre(genre);
-            if (foundBooks.empty()) {
-                cout << "No books found in that genre." << endl;
-            } else {
-                for (const auto &book : foundBooks) {
-                    book.display();
-                }
-            }
+            // Display all books
+            library.displayAllBooks();
 
         } else if (choice == 6) {
-            library.displayAllBooks();
-        } else if (choice == 7) {
+            // Sort books by price
             library.sortByPrice();
             cout << "Books sorted by price." << endl;
-        } else if (choice == 8) {
+
+        } else if (choice == 7) {
+            // Sort books by year
             library.sortByYear();
             cout << "Books sorted by year." << endl;
-        } else if (choice == 9) {
-            library.sortByTitle();
-            cout << "Books sorted by title." << endl;
-        } else if (choice == 10) {
-            library.sortByAuthor();
-            cout << "Books sorted by author." << endl;
-        } else if (choice == 11) {
+
+        } else if (choice == 8) {
+            // Load books from a file
             string filename;
             cout << "Enter filename to load from: ";
             getline(cin, filename);
+
             library.loadBooksFromFile(filename);
-        } else if (choice == 12) {
+            cout << "Books loaded from file." << endl;
+
+        } else if (choice == 9) {
+            // Save books to a file
             string filename;
             cout << "Enter filename to save to: ";
             getline(cin, filename);
+
             library.saveBooksToFile(filename);
-        } else if (choice == 13) {
-            string isbn;
-            cout << "Enter ISBN of the book to borrow: ";
-            getline(cin, isbn);
-            auto foundBooks = library.searchByTitle(isbn);
-            if (!foundBooks.empty()) {
-                user1.borrowBook(foundBooks[0]);
-            }
-        } else if (choice == 14) {
-            string isbn;
-            cout << "Enter ISBN of the book to return: ";
-            getline(cin, isbn);
-            auto foundBooks = library.searchByTitle(isbn);
-            if (!foundBooks.empty()) {
-                user1.returnBook(foundBooks[0]);
-            }
-        } else if (choice == 15) {
-            cout << "Exiting the program." << endl;
+            cout << "Books saved to file." << endl;
+
+        } else if (choice == 10) {
+            // Display total number of books
+            library.displayTotalBooks();
+
+        } else if (choice == 11) {
+            // Clear all books
+            library.clearBooks();
+
+        } else if (choice == 12) {
+            // Exit the program
+            cout << "Exiting program..." << endl;
             break;
         }
     }
