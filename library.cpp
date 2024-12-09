@@ -164,6 +164,54 @@ public:
         books.clear();
         cout << "All books have been removed from the library!" << endl;
     }
+
+    // Display book by ISBN
+    void displayBookByISBN(const string &isbn) const {
+        auto it = find_if(books.begin(), books.end(), [&](const Book &book) {
+            return book.isbn == isbn;
+        });
+
+        if (it != books.end()) {
+            it->display();
+        } else {
+            cout << "Book not found!" << endl;
+        }
+    }
+
+    // Update book details
+    void updateBookDetails(const string &isbn) {
+        auto it = find_if(books.begin(), books.end(), [&](const Book &book) {
+            return book.isbn == isbn;
+        });
+
+        if (it != books.end()) {
+            string newTitle, newAuthor;
+            int newYear;
+            double newPrice;
+
+            cout << "Enter new title (current: " << it->title << "): ";
+            cin.ignore(); // To clear leftover newline
+            getline(cin, newTitle);
+
+            cout << "Enter new author (current: " << it->author << "): ";
+            getline(cin, newAuthor);
+
+            cout << "Enter new year (current: " << it->year << "): ";
+            cin >> newYear;
+
+            cout << "Enter new price (current: " << it->price << "): ";
+            cin >> newPrice;
+
+            it->title = newTitle;
+            it->author = newAuthor;
+            it->year = newYear;
+            it->price = newPrice;
+
+            cout << "Book details updated successfully!" << endl;
+        } else {
+            cout << "Book not found!" << endl;
+        }
+    }
 };
 
 // Display the main menu options
@@ -180,7 +228,9 @@ void displayMenu() {
     cout << "9. Save books to file\n";
     cout << "10. Display total books\n";
     cout << "11. Clear all books\n";
-    cout << "12. Exit\n";
+    cout << "12. Display book by ISBN\n";
+    cout << "13. Update book details\n";
+    cout << "14. Exit\n";
     cout << "Enter your choice: ";
 }
 
@@ -193,9 +243,9 @@ int getValidIntegerInput() {
         if (cin.fail()) { // Check if the input is invalid
             cin.clear(); // Clear the error state
             cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore invalid characters
-            cout << "Invalid input. Please enter a number between 1 and 12.\n";
-        } else if (choice < 1 || choice > 12) {
-            cout << "Invalid choice. Please enter a number between 1 and 12.\n";
+            cout << "Invalid input. Please enter a number between 1 and 14.\n";
+        } else if (choice < 1 || choice > 14) {
+            cout << "Invalid choice. Please enter a number between 1 and 14.\n";
         } else {
             break; // Valid input, break out of the loop
         }
@@ -314,6 +364,24 @@ int main() {
             library.clearBooks();
 
         } else if (choice == 12) {
+            // Display book by ISBN
+            string isbn;
+            cout << "Enter ISBN to display: ";
+            cin.ignore(); // To ignore the leftover newline
+            getline(cin, isbn);
+
+            library.displayBookByISBN(isbn);
+
+        } else if (choice == 13) {
+            // Update book details
+            string isbn;
+            cout << "Enter ISBN of the book to update: ";
+            cin.ignore(); // To ignore the leftover newline
+            getline(cin, isbn);
+
+            library.updateBookDetails(isbn);
+
+        } else if (choice == 14) {
             // Exit the program
             cout << "Exiting program..." << endl;
             break;
