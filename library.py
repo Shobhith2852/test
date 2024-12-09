@@ -3,7 +3,7 @@ from typing import List, Optional
 
 # Class definition for Book
 class Book:
-    def __init__(self, title: str = "", author: str = "", isbn: str = "", year: int = 0, price: float = 0.0):
+    def __init__(self, title="", author="", isbn="", year=0, price=0.0):
         self.title = title
         self.author = author
         self.isbn = isbn
