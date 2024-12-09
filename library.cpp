@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <iomanip>
+#include <limits> // For std::numeric_limits
 
 using namespace std;
 
@@ -44,7 +45,7 @@ public:
         getline(file, a);
         getline(file, i);
         file >> y >> p;
-        file.ignore();
+        file.ignore(); // To consume the newline character
 
         return Book(t, a, i, y, p);
     }
@@ -172,19 +173,24 @@ void displayMenu() {
 // Main function for library management
 int main() {
     Library library;
+    int choice;
 
     while (true) {
         displayMenu();
 
-        int choice;
-        cin >> choice;
+        // Validate menu choice input
+        while (true) {
+            cin >> choice;
 
-        // Handle invalid input
-        if (cin.fail()) {
-            cin.clear(); // Clear error flag
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
-            cout << "Invalid input. Please enter a number between 1 and 10.\n";
-            continue; // Ask for the choice again
+            if (cin.fail()) { // Check if the input is invalid
+                cin.clear(); // Clear the error state
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore invalid characters
+                cout << "Invalid input. Please enter a number between 1 and 10.\n";
+            } else if (choice < 1 || choice > 10) {
+                cout << "Invalid choice. Please enter a number between 1 and 10.\n";
+            } else {
+                break; // Valid input, break out of the loop
+            }
         }
 
         if (choice == 1) {
@@ -284,8 +290,6 @@ int main() {
             // Exit the program
             cout << "Exiting program..." << endl;
             break;
-        } else {
-            cout << "Invalid choice, please try again." << endl;
         }
     }
 
