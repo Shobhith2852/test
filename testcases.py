@@ -9,20 +9,20 @@ class TestLibraryManagement(unittest.TestCase):
         self.book1 = Book("Title1", "Author1", "ISBN1", 2020, 15.99)
         self.book2 = Book("Title2", "Author2", "ISBN2", 2021, 10.99)
         self.book3 = Book("Another Title", "Author1", "ISBN3", 2019, 20.99)
-        self.library.addBook(self.book1)
-        self.library.addBook(self.book2)
-        self.library.addBook(self.book3)
+        self.library.add_book(self.book1)
+        self.library.add_book(self.book2)
+        self.library.add_book(self.book3)
 
     def test_add_book(self):
         self.assertEqual(len(self.library.books), 3)
         new_book = Book("New Title", "New Author", "ISBN4", 2022, 5.99)
-        self.library.addBook(new_book)
+        self.library.add_book(new_book)
         self.assertEqual(len(self.library.books), 4)
 
     def test_remove_book(self):
-        self.library.removeBook("ISBN2")
+        self.library.remove_book("ISBN2")
         self.assertEqual(len(self.library.books), 2)
-        self.assertIsNone(self.library.displayBookByISBN("ISBN2"))
+        self.assertIsNone(self.library.display_book_by_isbn("ISBN2"))
 
     def test_search_by_title(self):
         results = self.library.searchByTitle("Title")
