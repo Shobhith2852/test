@@ -170,7 +170,7 @@ public:
         cout << "All books have been removed from the library!" << endl;
     }
 
-Book displayBookByISBN(const string &isbn) const {
+std::optional<Book> displayBookByISBN(const string &isbn) const {
     auto it = find_if(books.begin(), books.end(), [&](const Book &book) {
         return book.isbn == isbn;
     });
@@ -180,9 +180,10 @@ Book displayBookByISBN(const string &isbn) const {
         return *it;     // Return the found book
     } else {
         cout << "Book not found!" << endl;
-        return Book();  // Return a default Book object if not found
+        return std::nullopt;  // Return an empty optional if not found
     }
 }
+
 
 
     // Update book details
