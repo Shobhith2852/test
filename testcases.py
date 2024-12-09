@@ -1,5 +1,5 @@
 import unittest
-from library_management import Book, Library
+from library import Book, Library
 import os
 
 class TestLibraryManagement(unittest.TestCase):
