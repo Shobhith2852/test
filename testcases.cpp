@@ -245,11 +245,16 @@ TEST(LibraryTest, DisplayBookByISBN) {
     Library library;
     Book b1("C++ Programming", "Bjarne Stroustrup", "12345", 2020, 29.99);
     library.addBook(b1);
+
+    auto bookOpt = library.displayBookByISBN("12345");
     
-    auto book = library.displayBookByISBN("12345");
+    // Assert that the book exists and check its properties
+    ASSERT_TRUE(bookOpt.has_value());
+    const Book& book = bookOpt.value();
     ASSERT_EQ(book.isbn, "12345");
     ASSERT_EQ(book.title, "C++ Programming");
 }
+
 
 // Test for updating book details
 TEST(LibraryTest, UpdateBookDetails) {
