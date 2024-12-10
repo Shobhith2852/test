@@ -1,61 +1,95 @@
-@import library
+# Import the classes to be tested
+from library import Library, Book
 
-# Pool definitions
-pool: <library> 1
-pool: <book> 4
+# State variables
+state library : Library
+state books_added : int
 
-# Initialize the Library
-<library> := library.Library()
+# Initialization of the library state
+def init_library():
+    library = Library()
+    books_added = 0
 
-# Book creation
-<book> := library.Book(
-    "Book_" + str(hash(GEN_INT)), 
-    "Author_" + str(hash(GEN_INT)), 
-    "ISBN_" + str(hash(GEN_INT)), 
-    1950 + (hash(GEN_INT) % 74), 
-    float(hash(GEN_INT) % 1000)
-)
+# Actions
+# Add a book to the library
+def add_book(title: str, author: str, isbn: str, year: int, price: float):
+    book = Book(title, author, isbn, year, price)
+    library.add_book(book)
+    books_added += 1
 
-# Actions for library management
-<action>
-<library>.add_book(<book>)
-</action>
+# Remove a book by ISBN
+def remove_book(isbn: str):
+    library.remove_book(isbn)
+    books_added = max(0, books_added - 1)
 
-<action>
-len(<library>.books) > 0 -> <library>.remove_book(<library>.books[0].isbn)
-</action>
+# Search for books by title
+def search_books_by_title(title: str):
+    books = library.search_by_title(title)
+    for book in books:
+        assert isinstance(book, Book)
 
-<action>
-len(<library>.books) > 0 -> <library>.search_by_title(<library>.books[0].title)
-</action>
+# Search for books by author
+def search_books_by_author(author: str):
+    books = library.search_by_author(author)
+    for book in books:
+        assert isinstance(book, Book)
 
-<action>
-len(<library>.books) > 0 -> <library>.search_by_author(<library>.books[0].author)
-</action>
+# Display all books
+def display_all_books():
+    library.display_all_books()
 
-<action>
-len(<library>.books) > 0 -> <library>.sort_by_price()
-</action>
+# Sort books by price
+def sort_books_by_price():
+    library.sort_by_price()
 
-<action>
-len(<library>.books) > 0 -> <library>.sort_by_year()
-</action>
+# Sort books by year
+def sort_books_by_year():
+    library.sort_by_year()
 
-<action>
-len(<library>.books) > 0 -> <library>.display_book_by_isbn(<library>.books[0].isbn)
-</action>
+# Display total books
+def display_total_books():
+    total = len(library.books)
+    assert total == books_added
+    library.display_total_books()
 
-<action>
-<library>.clear_books()
-</action>
+# Clear all books
+def clear_all_books():
+    library.clear_books()
+    books_added = 0
 
-# Validator
-<def>
-def valid(s):
-    return True
-</def>
+# Save books to a file
+def save_books_to_file(filename: str):
+    library.save_books_to_file(filename)
 
-# Precondition
-<precondition>
-len(<library>.books) >= 0
-</precondition>
+# Load books from a file
+def load_books_from_file(filename: str):
+    library.load_books_from_file(filename)
+
+# Display a book by ISBN
+def display_book_by_isbn(isbn: str):
+    book = library.display_book_by_isbn(isbn)
+    if book:
+        assert isinstance(book, Book)
+
+# Update a book's details
+def update_book_details(isbn: str, title: str = None, author: str = None, year: int = None, price: float = None):
+    book = Book(title or "", author or "", isbn, year or 0, price or 0.0)
+    library.update_book_details(isbn, book)
+
+# Action: add and remove a book
+def add_and_remove(title: str, author: str, isbn: str, year: int, price: float):
+    add_book(title, author, isbn, year, price)
+    remove_book(isbn)
+
+# Test scenarios
+init_library()
+add_book("Book1", "Author1", "12345", 2020, 10.0)
+add_book("Book2", "Author2", "67890", 2019, 15.0)
+remove_book("12345")
+search_books_by_title("Book2")
+search_books_by_author("Author2")
+display_all_books()
+sort_books_by_price()
+sort_books_by_year()
+display_total_books()
+clear_all_books()
