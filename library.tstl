@@ -19,7 +19,7 @@ pool: <library.Library> 1 OPAQUE
 pool: <library.Book> 5 OPAQUE
 pool: <str> 20
 pool: <int> 20
-pool: <float> 20
+pool: <int> 20
 
 # Initialize properties to check after each step
 property: len(<library.Library>.books) >= 0
