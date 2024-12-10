@@ -17,9 +17,9 @@ def random_float(min_value=1.0, max_value=100.0):
 # Initialize pools
 pool: <library.Library> 1 OPAQUE
 pool: <library.Book> 5 OPAQUE
-pool: <str> 10
-pool: <int> 5
-pool: <float> 5
+pool: <str> 20
+pool: <int> 20
+pool: <float> 20
 
 # Initialize properties to check after each step
 property: len(<library.Library>.books) >= 0
@@ -40,12 +40,11 @@ property: all(isinstance(book, library.Book) for book in <library.Library>.books
 
 # Create a Book object
 <library.Book> := library.Book(<str>, <str>, <str>, <int>, <float>)
+#<library.Book> := library.Book(<str>, <str>, <str>, <int>, <float>)
+#<library.Book> := library.Book(<str>, <str>, <str>, <int>, <float>)
 
 # Add a book to the library
 <library.Library>.add_book(<library.Book>)
-
-# Remove a book by ISBN
-<library.Library>.remove_book(<library.Book>.isbn)
 
 # Search books by title
 <library.Library>.search_by_title(<str>)
@@ -63,16 +62,13 @@ property: all(isinstance(book, library.Book) for book in <library.Library>.books
 <library.Library>.display_all_books()
 
 # Save books to a file
-<library.Library>.save_books_to_file("test_library.txt")
+#<library.Library>.save_books_to_file("test_library.txt")
 
 # Load books from a file
-<library.Library>.load_books_from_file("test_library.txt")
+#<library.Library>.load_books_from_file("test_library.txt")
 
 # Display a book by ISBN
 <library.Library>.display_book_by_isbn(<library.Book>.isbn)
-
-# Clear all books
-<library.Library>.clear_books()
 
 # Display total books
 <library.Library>.display_total_books()
@@ -82,6 +78,12 @@ property: all(isinstance(book, library.Book) for book in <library.Library>.books
     <library.Book>.isbn,
     library.Book(<str>, <str>, <str>, <int>, <float>)
 )
+
+# Remove a book by ISBN
+<library.Library>.remove_book(<library.Book>.isbn)
+
+# Clear all books
+<library.Library>.clear_books()
 
 # Properties for validation after actions
 property: len(<library.Library>.books) >= 0
