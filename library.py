@@ -13,17 +13,17 @@ class Book:
     def display(self):
         print("{:<20}{:<20}{:<15}{:<10}{:<10.2f}".format(self.title, self.author, self.isbn, self.year, self.price))
 
-    def save_to_file(self, file):
-        file.write("{}\n{}\n{}\n{}\n{}\n".format(self.title, self.author, self.isbn, self.year, self.price))
+   # def save_to_file(self, file):
+    #    file.write("{}\n{}\n{}\n{}\n{}\n".format(self.title, self.author, self.isbn, self.year, self.price))
 
-    @staticmethod
-    def load_from_file(file):
-        title = file.readline().strip()
-        author = file.readline().strip()
-        isbn = file.readline().strip()
-        year = int(file.readline().strip())
-        price = float(file.readline().strip())
-        return Book(title, author, isbn, year, price)
+    #@staticmethod
+    #def load_from_file(file):
+     #   title = file.readline().strip()
+      #  author = file.readline().strip()
+       # isbn = file.readline().strip()
+        #year = int(file.readline().strip())
+        #price = float(file.readline().strip())
+        #return Book(title, author, isbn, year, price)
 
 # Class to handle the library system
 class Library:
@@ -59,7 +59,7 @@ class Library:
         for book in self.books:
             book.display()
 
-    def load_books_from_file(self, filename: str):
+    '''def load_books_from_file(self, filename: str):
         if not os.path.exists(filename):
             print("File not found!")
             return
@@ -77,7 +77,7 @@ class Library:
     def save_books_to_file(self, filename: str):
         with open(filename, 'w') as file:
             for book in self.books:
-                book.save_to_file(file)
+                book.save_to_file(file)'''
 
     def display_total_books(self):
         print(f"Total books in the library: {len(self.books)}")
@@ -188,7 +188,7 @@ def main():
             library.sort_by_year()
             print("Books sorted by year.")
 
-        elif choice == 8:
+        '''elif choice == 8:
             filename = input("Enter filename to load from: ")
             library.load_books_from_file(filename)
             print("Books loaded from file.")
@@ -196,7 +196,7 @@ def main():
         elif choice == 9:
             filename = input("Enter filename to save to: ")
             library.save_books_to_file(filename)
-            print("Books saved to file.")
+            print("Books saved to file.")'''
 
         elif choice == 10:
             library.display_total_books()
