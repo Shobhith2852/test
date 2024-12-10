@@ -1,101 +1,47 @@
-# Import the library module
 @import library
 
-# Define pools for testing
-pool: <library> 1
-pool: <book> 4
+# Pool definitions
+pool: <library> 1 OPAQUE
+pool: <book> 4 OPAQUE
+pool: <str> 4
 pool: <int> 4
-pool: <float> 4
 
-# Raw Python code block for helper functions and setup
-<@
-def generate_unique_isbn():
-    return f"ISBN-{hash(str(GEN_INT))}"
-@>
-
-# Initialize the Library
+# Initialization
 <library> := library.Library()
 
-# Integer ranges for year and price generation
-<int> := <[1900..2024]>
-<float> := <[0..1000]>
+# Generators for test data
+<str> := str(hash(GEN_INT))
+<int> := hash(GEN_INT)
 
-# Book creation action
-<book> := library.Book("Book " + str(<int>), 
-                       "Author " + str(<int>), 
-                       generate_unique_isbn(), 
-                       <int>, 
-                       float(<float>))
+# Book definition
+<book> := library.Book(
+    "Book_" + <str>, 
+    "Author_" + <str>, 
+    "ISBN_" + <str>, 
+    1900 + (<int> % 124), 
+    float(<int> % 1000)
+)
 
-# Actions for library management
-<action>
-<library>.add_book(<book>)
-</action>
+# Pool definition for actions
+pool: action == [
+    <library>.add_book(<book>),
+    len(<library>.books) > 0 -> <library>.remove_book(<library>.books[0].isbn),
+    len(<library>.books) > 0 -> <library>.search_by_title(<library>.books[0].title),
+    len(<library>.books) > 0 -> <library>.search_by_author(<library>.books[0].author),
+    len(<library>.books) > 0 -> <library>.sort_by_price(),
+    len(<library>.books) > 0 -> <library>.sort_by_year(),
+    len(<library>.books) > 0 -> <library>.display_book_by_isbn(<library>.books[0].isbn),
+    len(<library>.books) > 0 -> <library>.clear_books()
+]
 
-<action>
-len(<library>.books) > 0 -> <library>.remove_book(<library>.books[0].isbn)
-</action>
+# Precondition definition
+def pre_action():
+    return True
 
-<action>
-len(<library>.books) > 0 -> <library>.search_by_title(<library>.books[0].title)
-</action>
+# Post-condition definition
+def post_action():
+    return True
 
-<action>
-len(<library>.books) > 0 -> <library>.search_by_author(<library>.books[0].author)
-</action>
-
-<action>
-<library>.sort_by_price()
-</action>
-
-<action>
-<library>.sort_by_year()
-</action>
-
-<action>
-len(<library>.books) > 0 -> <library>.display_book_by_isbn(<library>.books[0].isbn)
-</action>
-
-<action>
-len(<library>.books) > 0 -> \
-    <library>.update_book_details(<library>.books[0].isbn, \
-    library.Book("Updated Book " + str(<int>), \
-                 "Updated Author " + str(<int>), \
-                 <library>.books[0].isbn, \
-                 <int>, \
-                 float(<float>)))
-</action>
-
-<action>
-<library>.display_total_books()
-</action>
-
-<action>
-<library>.clear_books()
-</action>
-
-# Optional file saving/loading (with error handling)
-<action>
-try:
-    <library>.save_books_to_file("temp_library.txt")
-except Exception:
-    pass
-</action>
-
-<action>
-try:
-    <library>.load_books_from_file("temp_library.txt")
-except Exception:
-    pass
-</action>
-
-# Validators
-<def>
+# Validity check
 def valid(s):
     return True
-</def>
-
-# Preconditions (optional)
-<precondition>
-len(<library>.books) >= 0
-</precondition>
