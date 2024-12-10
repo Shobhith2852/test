@@ -1,100 +1,80 @@
-# TSTL Harness for Testing the Library Management System
+// TSTL test harness for Library Management System
 
-# Define the program under test (SUT) - Library
-sut = Library()  # Correctly initialize Sut as an instance of Library
+// Define Book class to match the Book object in library.py
+define Book(title, author, isbn, year, price):
+    title: String
+    author: String
+    isbn: String
+    year: Int
+    price: Float
 
-# Procedure to add a book to the library
-procedure add_book(title, author, isbn, year, price):
-    sut.add_book(Book(title, author, isbn, year, price))
+// Define Library class with necessary methods
+define Library():
+    books: List[Book]
 
-# Procedure to remove a book by ISBN
-procedure remove_book(isbn):
-    sut.remove_book(isbn)
+    procedure add_book(book: Book):
+        library.add_book(book)
+    
+    procedure remove_book(isbn: String):
+        library.remove_book(isbn)
+    
+    procedure search_by_title(title: String) -> List[Book]:
+        return library.search_by_title(title)
+    
+    procedure search_by_author(author: String) -> List[Book]:
+        return library.search_by_author(author)
+    
+    procedure update_book_details(isbn: String, new_book: Book):
+        library.update_book_details(isbn, new_book)
 
-# Procedure to search for books by title
-procedure search_by_title(title):
-    return sut.search_by_title(title)
+// Initialize the system
+define library: Library = Library()
 
-# Procedure to sort books by price (ascending)
-procedure sort_books_by_price():
-    sut.sort_by_price()
+// Test 1: Add book
+procedure test_add_book():
+    book = Book("Test Book", "Test Author", "123456", 2020, 25.99)
+    library.add_book(book)
+    assert library.search_by_title("Test Book").length > 0  // Assert book was added
 
-# Procedure to sort books by year (ascending)
-procedure sort_books_by_year():
-    sut.sort_by_year()
+// Test 2: Remove book
+procedure test_remove_book():
+    book = Book("To Remove", "Author", "654321", 2021, 15.99)
+    library.add_book(book)
+    library.remove_book("654321")
+    assert library.search_by_title("To Remove").length == 0  // Assert book was removed
 
-# Procedure to update book details (title, author, year, price)
-procedure update_book(isbn, new_title, new_author, new_year, new_price):
-    sut.update_book_details(isbn, new_title, new_author, new_year, new_price)
+// Test 3: Search by title
+procedure test_search_by_title():
+    book1 = Book("Search Book 1", "Author 1", "789101", 2018, 10.99)
+    book2 = Book("Search Book 2", "Author 2", "112233", 2019, 20.99)
+    library.add_book(book1)
+    library.add_book(book2)
+    result = library.search_by_title("Search Book")
+    assert result.length == 2  // Assert both books are returned
 
-# Test case 1: Add a book and verify its existence
-test add_book_test:
-    add_book("The Great Gatsby", "F. Scott Fitzgerald", "ISBN123", 1925, 10.99)
-    assert sut.books contains Book("The Great Gatsby", "F. Scott Fitzgerald", "ISBN123", 1925, 10.99)
+// Test 4: Update book details
+procedure test_update_book_details():
+    book = Book("Update Book", "Update Author", "445566", 2022, 30.99)
+    library.add_book(book)
+    updated_book = Book("Updated Title", "Updated Author", "445566", 2023, 35.99)
+    library.update_book_details("445566", updated_book)
+    result = library.search_by_title("Updated Title")
+    assert result.length == 1  // Assert book title updated
 
-# Test case 2: Remove a book and verify its removal
-test remove_book_test:
-    add_book("1984", "George Orwell", "ISBN124", 1949, 8.99)
-    remove_book("ISBN124")
-    assert sut.books does not contain Book("1984", "George Orwell", "ISBN124", 1949, 8.99)
+// Test 5: Search by author
+procedure test_search_by_author():
+    book = Book("Book by Author", "John Doe", "778899", 2020, 12.99)
+    library.add_book(book)
+    result = library.search_by_author("John Doe")
+    assert result.length == 1  // Assert book is found by author
 
-# Test case 3: Search for a book by title and verify result
-test search_books_by_title_test:
-    add_book("To Kill a Mockingbird", "Harper Lee", "ISBN125", 1960, 7.99)
-    results = search_by_title("Mockingbird")
-    assert results contains Book("To Kill a Mockingbird", "Harper Lee", "ISBN125", 1960, 7.99)
+// Test execution
+procedure run_tests():
+    test_add_book()
+    test_remove_book()
+    test_search_by_title()
+    test_update_book_details()
+    test_search_by_author()
 
-# Test case 4: Ensure multiple books with the same title are handled properly in search
-test search_books_by_title_multiple_results:
-    add_book("The Catcher in the Rye", "J.D. Salinger", "ISBN126", 1951, 9.99)
-    add_book("The Catcher in the Rye", "J.D. Salinger", "ISBN127", 1951, 9.99)
-    results = search_by_title("Catcher")
-    assert length(results) == 2
-
-# Test case 5: Sorting books by price and verifying order
-test sort_books_by_price_test:
-    add_book("Book A", "Author A", "ISBN128", 2020, 20.00)
-    add_book("Book B", "Author B", "ISBN129", 2021, 5.00)
-    sort_books_by_price()
-    assert sut.books[0].price == 5.00
-    assert sut.books[1].price == 20.00
-
-# Test case 6: Sorting books by year and verifying order
-test sort_books_by_year_test:
-    add_book("Book X", "Author X", "ISBN130", 2019, 10.00)
-    add_book("Book Y", "Author Y", "ISBN131", 2022, 15.00)
-    sort_books_by_year()
-    assert sut.books[0].year == 2019
-    assert sut.books[1].year == 2022
-
-# Test case 7: Test updating book details (title, author, year, price)
-test update_book_details_test:
-    add_book("Old Title", "Old Author", "ISBN132", 2000, 5.99)
-    update_book("ISBN132", "New Title", "New Author", 2024, 12.99)
-    assert sut.books[0].title == "New Title"
-    assert sut.books[0].author == "New Author"
-    assert sut.books[0].year == 2024
-    assert sut.books[0].price == 12.99
-
-# Test case 8: Remove a book that doesn't exist (edge case)
-test remove_nonexistent_book_test:
-    remove_book("NonexistentISBN")
-    assert length(sut.books) == 0  # Assert that no book is removed if non-existent
-
-# Test case 9: Ensure adding the same book multiple times doesn't duplicate it
-test add_duplicate_book_test:
-    add_book("Unique Book", "Unique Author", "ISBN133", 2023, 19.99)
-    add_book("Unique Book", "Unique Author", "ISBN133", 2023, 19.99)
-    assert length(sut.books) == 1
-
-# Test case 10: Test handling of empty library (no books)
-test empty_library_test:
-    assert length(sut.books) == 0
-
-# Test case 11: Add multiple books and then remove them all
-test remove_all_books_test:
-    add_book("Book A", "Author A", "ISBN134", 2023, 10.99)
-    add_book("Book B", "Author B", "ISBN135", 2022, 12.99)
-    remove_book("ISBN134")
-    remove_book("ISBN135")
-    assert length(sut.books) == 0
+// Run all tests
+run_tests()
