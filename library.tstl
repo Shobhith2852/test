@@ -18,8 +18,8 @@ def random_float(min_value=1.0, max_value=100.0):
 pool: <library.Library> 1 OPAQUE
 pool: <library.Book> 5 OPAQUE
 pool: <str> 20
-pool: <int> 20
-pool: <int> 20
+pool: <int> 40
+#pool: <float> 20
 
 # Initialize properties to check after each step
 property: len(<library.Library>.books) >= 0
@@ -36,12 +36,12 @@ property: all(isinstance(book, library.Book) for book in <library.Library>.books
 <int> := <[1900..2023]>
 
 # Generate random floats (prices)
-<float> := CALL(random_float)
+#<float> := CALL(random_float)
 
 # Create a Book object
-<library.Book> := library.Book(<str>, <str>, <str>, <int>, <float>)
-#<library.Book> := library.Book(<str>, <str>, <str>, <int>, <float>)
-#<library.Book> := library.Book(<str>, <str>, <str>, <int>, <float>)
+<library.Book> := library.Book(<str>, <str>, <str>, <int>, <int>)
+#<library.Book> := library.Book(<str>, <str>, <str>, <int>, <int>)
+#<library.Book> := library.Book(<str>, <str>, <str>, <int>, <int>)
 
 # Add a book to the library
 <library.Library>.add_book(<library.Book>)
@@ -76,7 +76,7 @@ property: all(isinstance(book, library.Book) for book in <library.Library>.books
 # Update book details
 <library.Library>.update_book_details(
     <library.Book>.isbn,
-    library.Book(<str>, <str>, <str>, <int>, <float>)
+    library.Book(<str>, <str>, <str>, <int>, <int>)
 )
 
 # Remove a book by ISBN
