@@ -1,6 +1,6 @@
-// TSTL test harness for Library Management System
+# TSTL test harness for Library Management System
 
-// Define Book class to match the Book object in library.py
+# Define Book class to match the Book object in library.py
 define Book(title, author, isbn, year, price):
     title: String
     author: String
@@ -8,7 +8,7 @@ define Book(title, author, isbn, year, price):
     year: Int
     price: Float
 
-// Define Library class with necessary methods
+# Define Library class with necessary methods
 define Library():
     books: List[Book]
 
@@ -27,48 +27,48 @@ define Library():
     procedure update_book_details(isbn: String, new_book: Book):
         library.update_book_details(isbn, new_book)
 
-// Initialize the system
+# Initialize the system
 define library: Library = Library()
 
-// Test 1: Add book
+# Test 1: Add book
 procedure test_add_book():
     book = Book("Test Book", "Test Author", "123456", 2020, 25.99)
     library.add_book(book)
-    assert library.search_by_title("Test Book").length > 0  // Assert book was added
+    assert library.search_by_title("Test Book").length > 0  # Assert book was added
 
-// Test 2: Remove book
+# Test 2: Remove book
 procedure test_remove_book():
     book = Book("To Remove", "Author", "654321", 2021, 15.99)
     library.add_book(book)
     library.remove_book("654321")
-    assert library.search_by_title("To Remove").length == 0  // Assert book was removed
+    assert library.search_by_title("To Remove").length == 0  # Assert book was removed
 
-// Test 3: Search by title
+# Test 3: Search by title
 procedure test_search_by_title():
     book1 = Book("Search Book 1", "Author 1", "789101", 2018, 10.99)
     book2 = Book("Search Book 2", "Author 2", "112233", 2019, 20.99)
     library.add_book(book1)
     library.add_book(book2)
     result = library.search_by_title("Search Book")
-    assert result.length == 2  // Assert both books are returned
+    assert result.length == 2  # Assert both books are returned
 
-// Test 4: Update book details
+# Test 4: Update book details
 procedure test_update_book_details():
     book = Book("Update Book", "Update Author", "445566", 2022, 30.99)
     library.add_book(book)
     updated_book = Book("Updated Title", "Updated Author", "445566", 2023, 35.99)
     library.update_book_details("445566", updated_book)
     result = library.search_by_title("Updated Title")
-    assert result.length == 1  // Assert book title updated
+    assert result.length == 1  # Assert book title updated
 
-// Test 5: Search by author
+# Test 5: Search by author
 procedure test_search_by_author():
     book = Book("Book by Author", "John Doe", "778899", 2020, 12.99)
     library.add_book(book)
     result = library.search_by_author("John Doe")
-    assert result.length == 1  // Assert book is found by author
+    assert result.length == 1  # Assert book is found by author
 
-// Test execution
+# Test execution
 procedure run_tests():
     test_add_book()
     test_remove_book()
@@ -76,5 +76,5 @@ procedure run_tests():
     test_update_book_details()
     test_search_by_author()
 
-// Run all tests
+# Run all tests
 run_tests()
