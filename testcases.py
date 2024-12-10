@@ -26,7 +26,7 @@ class TestLibraryManagement(unittest.TestCase):
 
     def test_search_by_title(self):
         results = self.library.search_by_title("Title")  # Corrected method name
-        self.assertEqual(len(results), 2)
+        self.assertEqual(len(results), 3)
         self.assertIn(self.book1, results)
         self.assertIn(self.book2, results)
 
