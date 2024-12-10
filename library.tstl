@@ -3,60 +3,60 @@
 # Define the program under test (SUT) - Library
 sut = Library()  # Correctly initialize Sut as an instance of Library
 
-# Define the Book object with attributes like title, author, ISBN, year, and price
-define Book(title, author, isbn, year, price)
+# Book definition: Create a schema for books in the library
+define Book(title, author, isbn, year, price):
     Book.title = title
     Book.author = author
     Book.isbn = isbn
     Book.year = year
     Book.price = price
 
-# Function to add a book to the library
-procedure add_book(book)
+# Procedure to add a book to the library
+procedure add_book(book):
     sut.add_book(book)
 
-# Function to remove a book by ISBN
-procedure remove_book(isbn)
+# Procedure to remove a book by ISBN
+procedure remove_book(isbn):
     sut.remove_book(isbn)
 
-# Function to search books by title
-procedure search_by_title(title)
+# Procedure to search for books by title
+procedure search_by_title(title):
     return sut.search_by_title(title)
 
-# Function to sort books by price (ascending)
-procedure sort_books_by_price()
+# Procedure to sort books by price (ascending)
+procedure sort_books_by_price():
     sut.sort_by_price()
 
-# Function to sort books by year (ascending)
-procedure sort_books_by_year()
+# Procedure to sort books by year (ascending)
+procedure sort_books_by_year():
     sut.sort_by_year()
 
-# Function to update book details (title, author, year, price)
-procedure update_book(isbn, new_title, new_author, new_year, new_price)
+# Procedure to update book details (title, author, year, price)
+procedure update_book(isbn, new_title, new_author, new_year, new_price):
     sut.update_book_details(isbn, new_title, new_author, new_year, new_price)
 
 # Test case 1: Add a book and verify its existence
-test add_book_test
+test add_book_test:
     Book1 = Book("The Great Gatsby", "F. Scott Fitzgerald", "ISBN123", 1925, 10.99)
     add_book(Book1)
     assert sut.books contains Book1
 
 # Test case 2: Remove a book and verify its removal
-test remove_book_test
+test remove_book_test:
     Book2 = Book("1984", "George Orwell", "ISBN124", 1949, 8.99)
     add_book(Book2)
     remove_book("ISBN124")
     assert sut.books does not contain Book2
 
 # Test case 3: Search for a book by title and verify result
-test search_books_by_title_test
+test search_books_by_title_test:
     Book3 = Book("To Kill a Mockingbird", "Harper Lee", "ISBN125", 1960, 7.99)
     add_book(Book3)
     results = search_by_title("Mockingbird")
     assert results contains Book3
 
 # Test case 4: Ensure multiple books with the same title are handled properly in search
-test search_books_by_title_multiple_results
+test search_books_by_title_multiple_results:
     Book4 = Book("The Catcher in the Rye", "J.D. Salinger", "ISBN126", 1951, 9.99)
     Book5 = Book("The Catcher in the Rye", "J.D. Salinger", "ISBN127", 1951, 9.99)
     add_book(Book4)
@@ -67,7 +67,7 @@ test search_books_by_title_multiple_results
     assert results contains Book5
 
 # Test case 5: Sorting books by price and verifying order
-test sort_books_by_price_test
+test sort_books_by_price_test:
     Book6 = Book("Book A", "Author A", "ISBN128", 2020, 20.00)
     Book7 = Book("Book B", "Author B", "ISBN129", 2021, 5.00)
     add_book(Book6)
@@ -77,7 +77,7 @@ test sort_books_by_price_test
     assert sut.books[1] == Book6
 
 # Test case 6: Sorting books by year and verifying order
-test sort_books_by_year_test
+test sort_books_by_year_test:
     Book8 = Book("Book X", "Author X", "ISBN130", 2019, 10.00)
     Book9 = Book("Book Y", "Author Y", "ISBN131", 2022, 15.00)
     add_book(Book8)
@@ -87,7 +87,7 @@ test sort_books_by_year_test
     assert sut.books[1] == Book9
 
 # Test case 7: Test updating book details (title, author, year, price)
-test update_book_details_test
+test update_book_details_test:
     Book10 = Book("Old Title", "Old Author", "ISBN132", 2000, 5.99)
     add_book(Book10)
     update_book("ISBN132", "New Title", "New Author", 2024, 12.99)
@@ -95,24 +95,24 @@ test update_book_details_test
     assert sut.books contains Book10Updated
 
 # Test case 8: Remove a book that doesn't exist (edge case)
-test remove_nonexistent_book_test
+test remove_nonexistent_book_test:
     remove_book("NonexistentISBN")
     # Assert that no book is removed
     assert length(sut.books) == 0
 
 # Test case 9: Ensure adding the same book multiple times doesn't duplicate it
-test add_duplicate_book_test
+test add_duplicate_book_test:
     Book11 = Book("Unique Book", "Unique Author", "ISBN133", 2023, 19.99)
     add_book(Book11)
     add_book(Book11)
     assert length(sut.books) == 1  # Book should only be added once
 
 # Test case 10: Test handling of empty library (no books)
-test empty_library_test
+test empty_library_test:
     assert length(sut.books) == 0
 
 # Test case 11: Add multiple books and then remove them all
-test remove_all_books_test
+test remove_all_books_test:
     Book12 = Book("Book A", "Author A", "ISBN134", 2023, 10.99)
     Book13 = Book("Book B", "Author B", "ISBN135", 2022, 12.99)
     add_book(Book12)
@@ -122,7 +122,7 @@ test remove_all_books_test
     assert length(sut.books) == 0
 
 # Test case 12: Edge case for price sorting with equal prices
-test sort_books_by_equal_price_test
+test sort_books_by_equal_price_test:
     Book14 = Book("Same Price 1", "Author C", "ISBN136", 2020, 10.00)
     Book15 = Book("Same Price 2", "Author D", "ISBN137", 2021, 10.00)
     add_book(Book14)
@@ -132,7 +132,7 @@ test sort_books_by_equal_price_test
     assert sut.books[1] == Book15
 
 # Test case 13: Edge case for year sorting with equal years
-test sort_books_by_equal_year_test
+test sort_books_by_equal_year_test:
     Book16 = Book("Same Year 1", "Author E", "ISBN138", 2023, 8.99)
     Book17 = Book("Same Year 2", "Author F", "ISBN139", 2023, 9.99)
     add_book(Book16)
@@ -142,7 +142,7 @@ test sort_books_by_equal_year_test
     assert sut.books[1] == Book17
 
 # Test case 14: Verify that removing a book after sorting maintains order
-test remove_after_sorting_test
+test remove_after_sorting_test:
     Book18 = Book("Book 1", "Author G", "ISBN140", 2020, 5.00)
     Book19 = Book("Book 2", "Author H", "ISBN141", 2021, 8.00)
     Book20 = Book("Book 3", "Author I", "ISBN142", 2019, 3.00)
