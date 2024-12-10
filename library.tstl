@@ -4,6 +4,8 @@
 # Define pools for testing
 pool: <library> 1
 pool: <book> 4
+pool: <int> 4
+pool: <float> 4
 
 # Raw Python code block for helper functions and setup
 <@
@@ -14,12 +16,16 @@ def generate_unique_isbn():
 # Initialize the Library
 <library> := library.Library()
 
+# Integer ranges for year and price generation
+<int> := <[1900..2024]>
+<float> := <[0..1000]>
+
 # Book creation action
-<book> := library.Book("Book " + str(GEN_INT), 
-                       "Author " + str(GEN_INT), 
+<book> := library.Book("Book " + str(<int>), 
+                       "Author " + str(<int>), 
                        generate_unique_isbn(), 
-                       <[1900..2024]>, 
-                       <[0.0..1000.0]>)
+                       <int>, 
+                       float(<float>))
 
 # Actions for library management
 <action>
@@ -27,18 +33,15 @@ def generate_unique_isbn():
 </action>
 
 <action>
-if len(<library>.books) > 0:
-    <library>.remove_book(<library>.books[0].isbn)
+len(<library>.books) > 0 -> <library>.remove_book(<library>.books[0].isbn)
 </action>
 
 <action>
-if len(<library>.books) > 0:
-    <library>.search_by_title(<library>.books[0].title)
+len(<library>.books) > 0 -> <library>.search_by_title(<library>.books[0].title)
 </action>
 
 <action>
-if len(<library>.books) > 0:
-    <library>.search_by_author(<library>.books[0].author)
+len(<library>.books) > 0 -> <library>.search_by_author(<library>.books[0].author)
 </action>
 
 <action>
@@ -50,14 +53,17 @@ if len(<library>.books) > 0:
 </action>
 
 <action>
-if len(<library>.books) > 0:
-    <library>.display_book_by_isbn(<library>.books[0].isbn)
+len(<library>.books) > 0 -> <library>.display_book_by_isbn(<library>.books[0].isbn)
 </action>
 
 <action>
-if len(<library>.books) > 0:
-    book_to_update = <library>.books[0]
-    <library>.update_book_details(book_to_update.isbn)
+len(<library>.books) > 0 -> \
+    <library>.update_book_details(<library>.books[0].isbn, \
+    library.Book("Updated Book " + str(<int>), \
+                 "Updated Author " + str(<int>), \
+                 <library>.books[0].isbn, \
+                 <int>, \
+                 float(<float>)))
 </action>
 
 <action>
