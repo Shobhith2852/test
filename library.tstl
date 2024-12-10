@@ -1,104 +1,89 @@
-# TSTL test harness for Library Management System
+@import os
+@import typing
 
-# Define Book class to match the Book object in library.py
-object Book:
-    title: String
-    author: String
-    isbn: String
-    year: Int
-    price: Float
+# Class definition for Book
+# The reference mapping will correspond to TSTL functionality for methods
 
-    # Initialize Book object with attributes
-    procedure __init__(title: String, author: String, isbn: String, year: Int, price: Float):
-        this.title = title
-        this.author = author
-        this.isbn = isbn
-        this.year = year
-        this.price = price
+reference: Book ==> Book
+reference: display ==> display
+reference: save_to_file ==> save_to_file
+reference: load_from_file ==> load_from_file
 
-# Define Library class with necessary methods
-object Library:
-    books: List[Book]
+# Class definition for Library
+reference: Library ==> Library
+reference: add_book ==> add_book
+reference: remove_book ==> remove_book
+reference: search_by_title ==> search_by_title
+reference: search_by_author ==> search_by_author
+reference: sort_by_price ==> sort_by_price
+reference: sort_by_year ==> sort_by_year
+reference: display_all_books ==> display_all_books
+reference: load_books_from_file ==> load_books_from_file
+reference: save_books_to_file ==> save_books_to_file
+reference: display_total_books ==> display_total_books
+reference: clear_books ==> clear_books
+reference: display_book_by_isbn ==> display_book_by_isbn
+reference: update_book_details ==> update_book_details
 
-    # Initialize Library object with empty book list
-    procedure __init__():
-        this.books = []
+# Invariant checks and actions
+property: <Library>.display_all_books()
 
-    # Add book to the library
-    procedure add_book(book: Book):
-        this.books.append(book)
+# Test cases start here
 
-    # Remove book by ISBN
-    procedure remove_book(isbn: String):
-        book = next((b for b in this.books if b.isbn == isbn), None)
-        if book:
-            this.books.remove(book)
-        else:
-            fail("Book not found!")
+# Initialize Library instance
+<Library> := Library()
 
-    # Search books by title
-    procedure search_by_title(title: String) -> List[Book]:
-        return [b for b in this.books if title in b.title]
+# Create books and add them
+<Book> := Book("The Great Gatsby", "F. Scott Fitzgerald", "9780743273565", 1925, 10.99)
+~<Library>.add_book(<Book>)
 
-    # Update book details
-    procedure update_book_details(isbn: String, new_book: Book):
-        book = next((b for b in this.books if b.isbn == isbn), None)
-        if book:
-            book.title = new_book.title
-            book.author = new_book.author
-            book.year = new_book.year
-            book.price = new_book.price
-        else:
-            fail("Book not found!")
+<Book> := Book("1984", "George Orwell", "9780451524935", 1949, 8.99)
+~<Library>.add_book(<Book>)
 
-# Initialize the system
-object library = Library()
+# Search for books by title
+~<Library>.search_by_title("The Great Gatsby")
 
-# Test 1: Add book
-procedure test_add_book():
-    book = Book("Test Book", "Test Author", "123456", 2020, 25.99)
-    library.add_book(book)
-    assert library.search_by_title("Test Book").length > 0  # Assert book was added
+# Remove a book by ISBN
+~<Library>.remove_book("9780743273565")
 
-# Test 2: Remove book
-procedure test_remove_book():
-    book = Book("To Remove", "Author", "654321", 2021, 15.99)
-    library.add_book(book)
-    library.remove_book("654321")
-    assert library.search_by_title("To Remove").length == 0  # Assert book was removed
+# Search for books by author
+~<Library>.search_by_author("George Orwell")
 
-# Test 3: Search by title
-procedure test_search_by_title():
-    book1 = Book("Search Book 1", "Author 1", "789101", 2018, 10.99)
-    book2 = Book("Search Book 2", "Author 2", "112233", 2019, 20.99)
-    library.add_book(book1)
-    library.add_book(book2)
-    result = library.search_by_title("Search Book")
-    assert result.length == 2  # Assert both books are returned
+# Sort books by price
+~<Library>.sort_by_price()
 
-# Test 4: Update book details
-procedure test_update_book_details():
-    book = Book("Update Book", "Update Author", "445566", 2022, 30.99)
-    library.add_book(book)
-    updated_book = Book("Updated Title", "Updated Author", "445566", 2023, 35.99)
-    library.update_book_details("445566", updated_book)
-    result = library.search_by_title("Updated Title")
-    assert result.length == 1  # Assert book title updated
+# Save and load books from file
+~<Library>.save_books_to_file("library_books.txt")
+~<Library>.load_books_from_file("library_books.txt")
 
-# Test 5: Search by author
-procedure test_search_by_author():
-    book = Book("Book by Author", "John Doe", "778899", 2020, 12.99)
-    library.add_book(book)
-    result = library.search_by_author("John Doe")
-    assert result.length == 1  # Assert book is found by author
+# Display the total number of books
+~<Library>.display_total_books()
 
-# Test execution
-procedure run_tests():
-    test_add_book()
-    test_remove_book()
-    test_search_by_title()
-    test_update_book_details()
-    test_search_by_author()
+# Clear all books
+~<Library>.clear_books()
 
-# Run all tests
-run_tests()
+# Display a book by ISBN
+~<Library>.display_book_by_isbn("9780451524935")
+
+# Update book details
+<Book> := Book("1984", "George Orwell", "9780451524935", 1949, 12.99)
+~<Library>.update_book_details("9780451524935", <Book>)
+
+# Properties to validate after test actions
+property: <Library>.display_all_books()
+property: <Library>.display_total_books()
+
+# Test the complete cycle of adding, removing, and searching books
+<Library> := Library()
+<Book> := Book("To Kill a Mockingbird", "Harper Lee", "9780061120084", 1960, 7.99)
+~<Library>.add_book(<Book>)
+
+<Book> := Book("Moby-Dick", "Herman Melville", "9781503280786", 1851, 11.99)
+~<Library>.add_book(<Book>)
+
+~<Library>.remove_book("9780061120084")
+~<Library>.search_by_title("Moby-Dick")
+~<Library>.search_by_author("Herman Melville")
+~<Library>.display_total_books()
+
+# End of test cases
