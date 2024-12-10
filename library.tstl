@@ -1,34 +1,58 @@
 # TSTL test harness for Library Management System
 
 # Define Book class to match the Book object in library.py
-define Book(title, author, isbn, year, price):
+object Book:
     title: String
     author: String
     isbn: String
     year: Int
     price: Float
 
+    # Initialize Book object with attributes
+    procedure __init__(title: String, author: String, isbn: String, year: Int, price: Float):
+        this.title = title
+        this.author = author
+        this.isbn = isbn
+        this.year = year
+        this.price = price
+
 # Define Library class with necessary methods
-define Library():
+object Library:
     books: List[Book]
 
+    # Initialize Library object with empty book list
+    procedure __init__():
+        this.books = []
+
+    # Add book to the library
     procedure add_book(book: Book):
-        library.add_book(book)
-    
+        this.books.append(book)
+
+    # Remove book by ISBN
     procedure remove_book(isbn: String):
-        library.remove_book(isbn)
-    
+        book = next((b for b in this.books if b.isbn == isbn), None)
+        if book:
+            this.books.remove(book)
+        else:
+            fail("Book not found!")
+
+    # Search books by title
     procedure search_by_title(title: String) -> List[Book]:
-        return library.search_by_title(title)
-    
-    procedure search_by_author(author: String) -> List[Book]:
-        return library.search_by_author(author)
-    
+        return [b for b in this.books if title in b.title]
+
+    # Update book details
     procedure update_book_details(isbn: String, new_book: Book):
-        library.update_book_details(isbn, new_book)
+        book = next((b for b in this.books if b.isbn == isbn), None)
+        if book:
+            book.title = new_book.title
+            book.author = new_book.author
+            book.year = new_book.year
+            book.price = new_book.price
+        else:
+            fail("Book not found!")
 
 # Initialize the system
-define library: Library = Library()
+object library = Library()
 
 # Test 1: Add book
 procedure test_add_book():
