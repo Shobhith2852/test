@@ -1,13 +1,13 @@
 @import os
 @import math
 
-# Pools declaration for the Library and Book
-pool: <Library> 1
-pool: <Book> 3
+# Declare pools with a specific number of items
+pool: <Library> 1  # One library instance
+pool: <Book> 3     # Three book instances
 
 # Properties for the test
-property: <Library>.books == pre<( <Library>.books )>  # Ensure that the books list is consistent
-property: <Library>.books != []  # Books list should not be empty after adding books
+property: <Library(1)>.books == pre<( <Library(1)>.books )>  # Ensure that the books list is consistent
+property: <Library(1)>.books != []  # Books list should not be empty after adding books
 
 # Below is a larger block of raw python code, in <@...@> (put these on their own line), defining some functions used in testing
 <@
@@ -24,47 +24,47 @@ def load_books_from_file(sut, filename):
 @>
 
 # Declare the Library object pool
-<Library> := Library()
+<Library(1)> := Library()
 
-# Declare a Book object pool with 3 entries
-<Book> := Book("The Great Gatsby", "F. Scott Fitzgerald", "9780743273565", 1925, 10.99)
-<Book> := Book("1984", "George Orwell", "9780451524935", 1949, 9.99)
-<Book> := Book("To Kill a Mockingbird", "Harper Lee", "9780061120084", 1960, 14.99)
+# Declare Book object pool with 3 entries
+<Book(1)> := Book("The Great Gatsby", "F. Scott Fitzgerald", "9780743273565", 1925, 10.99)
+<Book(2)> := Book("1984", "George Orwell", "9780451524935", 1949, 9.99)
+<Book(3)> := Book("To Kill a Mockingbird", "Harper Lee", "9780061120084", 1960, 14.99)
 
 # Add books to the library
-~<Library>.add_book(<Book>) => \
-   len(<Library>.books) == pre<(len(<Library>.books))> + 1
+~<Library(1)>.add_book(<Book(1)>) => \
+   len(<Library(1)>.books) == pre<(len(<Library(1)>.books))> + 1
 
-~<Library>.add_book(<Book,2>) => \
-   len(<Library>.books) == pre<(len(<Library>.books))> + 1
+~<Library(1)>.add_book(<Book(2)>) => \
+   len(<Library(1)>.books) == pre<(len(<Library(1)>.books))> + 1
 
-~<Library>.add_book(<Book,3>) => \
-   len(<Library>.books) == pre<(len(<Library>.books))> + 1
+~<Library(1)>.add_book(<Book(3)>) => \
+   len(<Library(1)>.books) == pre<(len(<Library(1)>.books))> + 1
 
 # Search for books by title and ensure there are matching results
-~<Library>.search_by_title("1984") => \
-   len(pre<(<Library>.search_by_title("1984"))>) > 0
+~<Library(1)>.search_by_title("1984") => \
+   len(pre<(<Library(1)>.search_by_title("1984"))>) > 0
 
 # Remove a book from the library by ISBN
-~<Library>.remove_book("9780743273565") => \
-   len(<Library>.books) == pre<(len(<Library>.books))> - 1
+~<Library(1)>.remove_book("9780743273565") => \
+   len(<Library(1)>.books) == pre<(len(<Library(1)>.books))> - 1
 
 # Sort books by price
-~<Library>.sort_by_price() => \
-   pre<( <Library>.books[0].price )> <= <Library>.books[0].price
+~<Library(1)>.sort_by_price() => \
+   pre<( <Library(1)>.books[0].price )> <= <Library(1)>.books[0].price
 
 # Save and load books to/from a file
-<Library>.display_total_books()
-<Library>.display_all_books()
+<Library(1)>.display_total_books()
+<Library(1)>.display_all_books()
 
-~<Library>.save_books_to_file("books.txt")
-~<Library>.clear_books()
+~<Library(1)>.save_books_to_file("books.txt")
+~<Library(1)>.clear_books()
 
-~<Library>.load_books_from_file("books.txt")
-~<Library>.display_total_books()
+~<Library(1)>.load_books_from_file("books.txt")
+~<Library(1)>.display_total_books()
 
 # User-defined guard to display books only if there are more than 2 books
-len(<Library>.books) > 2 -> <Library>.display_all_books()
+len(<Library(1)>.books) > 2 -> <Library(1)>.display_all_books()
 
 # Compare actions with a reference implementation
 reference: Book ==> Book
