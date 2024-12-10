@@ -1,47 +1,61 @@
 @import library
 
 # Pool definitions
-pool: <library> 1 OPAQUE
-pool: <book> 4 OPAQUE
-pool: <str> 4
-pool: <int> 4
+pool: <library> 1
+pool: <book> 4
 
-# Initialization
+# Initialize the Library
 <library> := library.Library()
 
-# Generators for test data
-<str> := str(hash(GEN_INT))
-<int> := hash(GEN_INT)
-
-# Book definition
+# Book creation
 <book> := library.Book(
-    "Book_" + <str>, 
-    "Author_" + <str>, 
-    "ISBN_" + <str>, 
-    1900 + (<int> % 124), 
-    float(<int> % 1000)
+    "Book_" + str(hash(GEN_INT)), 
+    "Author_" + str(hash(GEN_INT)), 
+    "ISBN_" + str(hash(GEN_INT)), 
+    1950 + (hash(GEN_INT) % 74), 
+    float(hash(GEN_INT) % 1000)
 )
 
-# Pool definition for actions
-pool: action == [
-    <library>.add_book(<book>),
-    len(<library>.books) > 0 -> <library>.remove_book(<library>.books[0].isbn),
-    len(<library>.books) > 0 -> <library>.search_by_title(<library>.books[0].title),
-    len(<library>.books) > 0 -> <library>.search_by_author(<library>.books[0].author),
-    len(<library>.books) > 0 -> <library>.sort_by_price(),
-    len(<library>.books) > 0 -> <library>.sort_by_year(),
-    len(<library>.books) > 0 -> <library>.display_book_by_isbn(<library>.books[0].isbn),
-    len(<library>.books) > 0 -> <library>.clear_books()
-]
+# Actions for library management
+<action>
+<library>.add_book(<book>)
+</action>
 
-# Precondition definition
-def pre_action():
-    return True
+<action>
+len(<library>.books) > 0 -> <library>.remove_book(<library>.books[0].isbn)
+</action>
 
-# Post-condition definition
-def post_action():
-    return True
+<action>
+len(<library>.books) > 0 -> <library>.search_by_title(<library>.books[0].title)
+</action>
 
-# Validity check
+<action>
+len(<library>.books) > 0 -> <library>.search_by_author(<library>.books[0].author)
+</action>
+
+<action>
+len(<library>.books) > 0 -> <library>.sort_by_price()
+</action>
+
+<action>
+len(<library>.books) > 0 -> <library>.sort_by_year()
+</action>
+
+<action>
+len(<library>.books) > 0 -> <library>.display_book_by_isbn(<library>.books[0].isbn)
+</action>
+
+<action>
+<library>.clear_books()
+</action>
+
+# Validator
+<def>
 def valid(s):
     return True
+</def>
+
+# Precondition
+<precondition>
+len(<library>.books) >= 0
+</precondition>
