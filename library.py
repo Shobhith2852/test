@@ -63,10 +63,16 @@ class Library:
         if not os.path.exists(filename):
             print("File not found!")
             return
-
+    
         with open(filename, 'r') as file:
-            while file.peek(1):
-                self.books.append(Book.load_from_file(file))
+            while True:
+                try:
+                    book = Book.load_from_file(file)
+                    if book:
+                        self.books.append(book)
+                except ValueError:
+                    break  # Break out of the loop if there is an issue with file format (end of file or invalid data)
+
 
     def save_books_to_file(self, filename: str):
         with open(filename, 'w') as file:
