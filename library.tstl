@@ -1,89 +1,95 @@
-@import book import Book
-@import library import Library
+# Import the library module
+@import library
 
-# Define the system under test
-< library = Library() >
+# Define pools for testing
+pool: <library> 1
+pool: <book> 4
 
-# Actions to test the library management system
+# Raw Python code block for helper functions and setup
+<@
+def generate_unique_isbn():
+    return f"ISBN-{hash(str(GEN_INT))}"
+@>
+
+# Initialize the Library
+<library> := library.Library()
+
+# Book creation action
+<book> := library.Book("Book " + str(GEN_INT), 
+                       "Author " + str(GEN_INT), 
+                       generate_unique_isbn(), 
+                       <[1900..2024]>, 
+                       <[0.0..1000.0]>)
+
+# Actions for library management
 <action>
-library.add_book(Book("Test Title " + str(GEN_INT), "Test Author " + str(GEN_INT), "ISBN-" + str(GEN_INT), GEN_YEAR, GEN_FLOAT))
+<library>.add_book(<book>)
 </action>
 
 <action>
-if library.books:
-    library.remove_book(library.books[0].isbn)
+if len(<library>.books) > 0:
+    <library>.remove_book(<library>.books[0].isbn)
 </action>
 
 <action>
-if library.books:
-    library.search_by_title(library.books[0].title)
+if len(<library>.books) > 0:
+    <library>.search_by_title(<library>.books[0].title)
 </action>
 
 <action>
-if library.books:
-    library.search_by_author(library.books[0].author)
+if len(<library>.books) > 0:
+    <library>.search_by_author(<library>.books[0].author)
 </action>
 
 <action>
-library.sort_by_price()
+<library>.sort_by_price()
 </action>
 
 <action>
-library.sort_by_year()
+<library>.sort_by_year()
 </action>
 
 <action>
-library.display_all_books()
+if len(<library>.books) > 0:
+    <library>.display_book_by_isbn(<library>.books[0].isbn)
 </action>
 
 <action>
-library.display_total_books()
+if len(<library>.books) > 0:
+    book_to_update = <library>.books[0]
+    <library>.update_book_details(book_to_update.isbn)
 </action>
 
-# Special action for updating book details
 <action>
-if library.books:
-    book_to_update = library.books[0]
-    library.update_book_details(book_to_update.isbn, 
-        Book("Updated Title " + str(GEN_INT), 
-             "Updated Author " + str(GEN_INT), 
-             book_to_update.isbn, 
-             GEN_YEAR, 
-             GEN_FLOAT))
+<library>.display_total_books()
 </action>
 
-# Temporary file actions (with error handling)
+<action>
+<library>.clear_books()
+</action>
+
+# Optional file saving/loading (with error handling)
 <action>
 try:
-    library.save_books_to_file("temp_library.txt")
+    <library>.save_books_to_file("temp_library.txt")
 except Exception:
     pass
 </action>
 
 <action>
 try:
-    library.load_books_from_file("temp_library.txt")
+    <library>.load_books_from_file("temp_library.txt")
 except Exception:
     pass
 </action>
 
-<action>
-library.clear_books()
-</action>
-
-# Validators to check system state
+# Validators
 <def>
 def valid(s):
     return True
 </def>
 
-# Preconditions for actions
+# Preconditions (optional)
 <precondition>
-library.books or len(library.books) > 0
+len(<library>.books) >= 0
 </precondition>
-
-# Generators for test data
-GEN_INT = int
-GEN_FLOAT = float
-GEN_YEAR = int
-GEN_STR = str
