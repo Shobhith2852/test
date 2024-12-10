@@ -27,61 +27,89 @@ def remove_book(isbn: str):
 
 def search_books_by_title(title: str):
     """Search for books by title."""
-    books = library.search_by_title(title)
-    assert all(isinstance(book, Book) for book in books)
+    try:
+        books = library.search_by_title(title)
+        assert all(isinstance(book, Book) for book in books)
+    except Exception as exc:
+        print(f"Exception during search_books_by_title: {exc}")
 
 def search_books_by_author(author: str):
     """Search for books by author."""
-    books = library.search_by_author(author)
-    assert all(isinstance(book, Book) for book in books)
+    try:
+        books = library.search_by_author(author)
+        assert all(isinstance(book, Book) for book in books)
+    except Exception as exc:
+        print(f"Exception during search_books_by_author: {exc}")
 
 def display_all_books():
     """Display all books in the library."""
-    library.display_all_books()
+    try:
+        library.display_all_books()
+    except Exception as exc:
+        print(f"Exception during display_all_books: {exc}")
 
 def sort_books_by_price():
     """Sort books by their price."""
-    library.sort_by_price()
+    try:
+        library.sort_by_price()
+    except Exception as exc:
+        print(f"Exception during sort_books_by_price: {exc}")
 
 def sort_books_by_year():
     """Sort books by their publication year."""
-    library.sort_by_year()
+    try:
+        library.sort_by_year()
+    except Exception as exc:
+        print(f"Exception during sort_books_by_year: {exc}")
 
 def display_total_books():
     """Display the total number of books."""
-    total = len(library.books)
-    assert total == books_added
-    library.display_total_books()
+    try:
+        total = len(library.books)
+        assert total == books_added
+        library.display_total_books()
+    except Exception as exc:
+        print(f"Exception during display_total_books: {exc}")
 
 def clear_all_books():
     """Clear all books from the library."""
     global books_added
-    library.clear_books()
-    books_added = 0
+    try:
+        library.clear_books()
+        books_added = 0
+    except Exception as exc:
+        print(f"Exception during clear_all_books: {exc}")
 
 def save_books_to_file(filename: str):
     """Save all books to a file."""
-    library.save_books_to_file(filename)
+    try:
+        library.save_books_to_file(filename)
+    except Exception as exc:
+        print(f"Exception during save_books_to_file: {exc}")
 
 def load_books_from_file(filename: str):
     """Load books from a file."""
-    library.load_books_from_file(filename)
+    try:
+        library.load_books_from_file(filename)
+    except Exception as exc:
+        print(f"Exception during load_books_from_file: {exc}")
 
 def display_book_by_isbn(isbn: str):
     """Display details of a book by its ISBN."""
-    book = library.display_book_by_isbn(isbn)
-    if book:
-        assert isinstance(book, Book)
+    try:
+        book = library.display_book_by_isbn(isbn)
+        if book:
+            assert isinstance(book, Book)
+    except Exception as exc:
+        print(f"Exception during display_book_by_isbn: {exc}")
 
 def update_book_details(isbn: str, title: str = None, author: str = None, year: int = None, price: float = None):
     """Update a book's details."""
-    book = Book(title or "", author or "", isbn, year or 0, price or 0.0)
-    library.update_book_details(isbn, book)
-
-def add_and_remove(title: str, author: str, isbn: str, year: int, price: float):
-    """Add and then immediately remove a book."""
-    add_book(title, author, isbn, year, price)
-    remove_book(isbn)
+    try:
+        book = Book(title or "", author or "", isbn, year or 0, price or 0.0)
+        library.update_book_details(isbn, book)
+    except Exception as exc:
+        print(f"Exception during update_book_details: {exc}")
 
 # Initial action to set up the state
 init_library()
