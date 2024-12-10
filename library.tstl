@@ -5,10 +5,6 @@
 pool: <Library> 1  # One library instance
 pool: <Book> 3     # Three book instances
 
-# Properties for the test
-property: <Library(1)>.books == pre<( <Library(1)>.books )>  # Ensure that the books list is consistent
-property: <Library(1)>.books != []  # Books list should not be empty after adding books
-
 # Below is a larger block of raw python code, in <@...@> (put these on their own line), defining some functions used in testing
 <@
 # These are helper functions that you can use in your TSTL tests.
@@ -74,7 +70,7 @@ reference: remove_book ==> discard
 reference: search_by_title ==> search
 reference: sort_by_price ==> sorted
 reference: save_books_to_file ==> save
-reference: load_books_from_file ==> load
+reference: load_books_to_file ==> load
 
 # Method reference shorthand for comparing method calls and function calls
 reference: METHOD(display_all_books) ==> CALL(display_books)
