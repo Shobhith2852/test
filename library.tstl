@@ -1,89 +1,82 @@
 @import os
-@import typing
-@import random
+@import math
 
-# Declare the pools
+# Pools declaration for the Library and Book
 pool: <Library> 1
-pool: <Book> 10
+pool: <Book> 3
 
-# Properties and invariants to check after each step
-property: <Library>.display_total_books()
-property: <Library>.display_book_by_isbn(pre<(<Library>.books[0].isbn)>)
+# Properties for the test
+property: <Library>.books == pre<( <Library>.books )>  # Ensure that the books list is consistent
+property: <Library>.books != []  # Books list should not be empty after adding books
 
-# Define the test after reduce function
+# Below is a larger block of raw python code, in <@...@> (put these on their own line), defining some functions used in testing
 <@
-def test_after_reduce(sut):
-    sut.setLog(0)  # turn off logging if it was enabled during reduction
+# These are helper functions that you can use in your TSTL tests.
+
+def display_books(sut):
+    sut.display_all_books()
+
+def save_books_to_file(sut, filename):
+    sut.save_books_to_file(filename)
+
+def load_books_from_file(sut, filename):
+    sut.load_books_from_file(filename)
 @>
 
-# Initialize the library system
+# Declare the Library object pool
 <Library> := Library()
 
-# Create a Book and add to library pool
+# Declare a Book object pool with 3 entries
 <Book> := Book("The Great Gatsby", "F. Scott Fitzgerald", "9780743273565", 1925, 10.99)
+<Book> := Book("1984", "George Orwell", "9780451524935", 1949, 9.99)
+<Book> := Book("To Kill a Mockingbird", "Harper Lee", "9780061120084", 1960, 14.99)
 
-# Add the book to the library
+# Add books to the library
 ~<Library>.add_book(<Book>) => \
-    len(<Library>.books) == pre<(len(<Library>.books))> + 1
+   len(<Library>.books) == pre<(len(<Library>.books))> + 1
 
-# Remove a book from library by ISBN
-~<Library>.remove_book(<Book.isbn>) => \
-    len(<Library>.books) == pre<(len(<Library>.books))> - 1
+~<Library>.add_book(<Book,2>) => \
+   len(<Library>.books) == pre<(len(<Library>.books))> + 1
 
-# Search books by title
-<Book> := Book("1984", "George Orwell", "9780451524935", 1949, 8.99)
-~<Library>.search_by_title(<Book.title>) => \
-    len(<Library>.search_by_title(<Book.title>)) > 0
+~<Library>.add_book(<Book,3>) => \
+   len(<Library>.books) == pre<(len(<Library>.books))> + 1
 
-# Search books by author
-<Book> := Book("To Kill a Mockingbird", "Harper Lee", "9780061120084", 1960, 7.99)
-~<Library>.search_by_author(<Book.author>) => \
-    len(<Library>.search_by_author(<Book.author>)) > 0
+# Search for books by title and ensure there are matching results
+~<Library>.search_by_title("1984") => \
+   len(pre<(<Library>.search_by_title("1984"))>) > 0
+
+# Remove a book from the library by ISBN
+~<Library>.remove_book("9780743273565") => \
+   len(<Library>.books) == pre<(len(<Library>.books))> - 1
 
 # Sort books by price
-~<Library>.sort_by_price()
+~<Library>.sort_by_price() => \
+   pre<( <Library>.books[0].price )> <= <Library>.books[0].price
 
-# Sort books by year
-~<Library>.sort_by_year()
+# Save and load books to/from a file
+<Library>.display_total_books()
+<Library>.display_all_books()
 
-# Display all books
-~<Library>.display_all_books()
-
-# Save books to file
-~<Library>.save_books_to_file("library_books.txt")
-
-# Load books from file
-~<Library>.load_books_from_file("library_books.txt")
-
-# Clear all books
+~<Library>.save_books_to_file("books.txt")
 ~<Library>.clear_books()
 
-# Update book details
-<Book> := Book("Updated Title", "Updated Author", "9781234567890", 2024, 15.99)
-~<Library>.update_book_details(<Book.isbn>, <Book>) => \
-    pre<(<Library>.books[0].title)> != <Book.title>
-
-# Display total books
+~<Library>.load_books_from_file("books.txt")
 ~<Library>.display_total_books()
 
-# Display book by ISBN
-<Book> := Book("The Catcher in the Rye", "J.D. Salinger", "9780316769488", 1951, 10.99)
-~<Library>.display_book_by_isbn(<Book.isbn>) => \
-    pre<(<Library>.books[0].isbn)> == <Book.isbn>
+# User-defined guard to display books only if there are more than 2 books
+len(<Library>.books) > 2 -> <Library>.display_all_books()
 
-# Define the reference for the Library and Book objects
-reference: Library ==> sut.Library
-reference: Book ==> sut.Book
-reference: add_book ==> sut.add_book
-reference: remove_book ==> sut.remove_book
-reference: search_by_title ==> sut.search_by_title
-reference: search_by_author ==> sut.search_by_author
-reference: sort_by_price ==> sut.sort_by_price
-reference: sort_by_year ==> sut.sort_by_year
-reference: display_all_books ==> sut.display_all_books
-reference: save_books_to_file ==> sut.save_books_to_file
-reference: load_books_from_file ==> sut.load_books_from_file
-reference: clear_books ==> sut.clear_books
-reference: update_book_details ==> sut.update_book_details
-reference: display_total_books ==> sut.display_total_books
-reference: display_book_by_isbn ==> sut.display_book_by_isbn
+# Compare actions with a reference implementation
+reference: Book ==> Book
+reference: Library ==> Library
+reference: add_book ==> add
+reference: remove_book ==> discard
+reference: search_by_title ==> search
+reference: sort_by_price ==> sorted
+reference: save_books_to_file ==> save
+reference: load_books_from_file ==> load
+
+# Method reference shorthand for comparing method calls and function calls
+reference: METHOD(display_all_books) ==> CALL(display_books)
+reference: METHOD(save_books_to_file) ==> CALL(save_books_to_file)
+reference: METHOD(load_books_from_file) ==> CALL(load_books_from_file)
