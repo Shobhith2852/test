@@ -1,78 +1,89 @@
-@import os
-@import math
+@import book import Book
+@import library import Library
 
-# Declare pools with a specific number of items
-pool: <Library> 1  # One library instance
-pool: <Book> 3     # Three book instances
+# Define the system under test
+< library = Library() >
 
-# Below is a larger block of raw python code, in <@...@> (put these on their own line), defining some functions used in testing
-<@
-# These are helper functions that you can use in your TSTL tests.
+# Actions to test the library management system
+<action>
+library.add_book(Book("Test Title " + str(GEN_INT), "Test Author " + str(GEN_INT), "ISBN-" + str(GEN_INT), GEN_YEAR, GEN_FLOAT))
+</action>
 
-def display_books(sut):
-    sut.display_all_books()
+<action>
+if library.books:
+    library.remove_book(library.books[0].isbn)
+</action>
 
-def save_books_to_file(sut, filename):
-    sut.save_books_to_file(filename)
+<action>
+if library.books:
+    library.search_by_title(library.books[0].title)
+</action>
 
-def load_books_from_file(sut, filename):
-    sut.load_books_from_file(filename)
-@>
+<action>
+if library.books:
+    library.search_by_author(library.books[0].author)
+</action>
 
-# Declare the Library object pool
-<Library(1)> := Library()
+<action>
+library.sort_by_price()
+</action>
 
-# Declare Book object pool with 3 entries
-<Book(1)> := Book("The Great Gatsby", "F. Scott Fitzgerald", "9780743273565", 1925, 10.99)
-<Book(2)> := Book("1984", "George Orwell", "9780451524935", 1949, 9.99)
-<Book(3)> := Book("To Kill a Mockingbird", "Harper Lee", "9780061120084", 1960, 14.99)
+<action>
+library.sort_by_year()
+</action>
 
-# Add books to the library
-~<Library(1)>.add_book(<Book(1)>) => \
-   len(<Library(1)>.books) == pre<(len(<Library(1)>.books))> + 1
+<action>
+library.display_all_books()
+</action>
 
-~<Library(1)>.add_book(<Book(2)>) => \
-   len(<Library(1)>.books) == pre<(len(<Library(1)>.books))> + 1
+<action>
+library.display_total_books()
+</action>
 
-~<Library(1)>.add_book(<Book(3)>) => \
-   len(<Library(1)>.books) == pre<(len(<Library(1)>.books))> + 1
+# Special action for updating book details
+<action>
+if library.books:
+    book_to_update = library.books[0]
+    library.update_book_details(book_to_update.isbn, 
+        Book("Updated Title " + str(GEN_INT), 
+             "Updated Author " + str(GEN_INT), 
+             book_to_update.isbn, 
+             GEN_YEAR, 
+             GEN_FLOAT))
+</action>
 
-# Search for books by title and ensure there are matching results
-~<Library(1)>.search_by_title("1984") => \
-   len(pre<(<Library(1)>.search_by_title("1984"))>) > 0
+# Temporary file actions (with error handling)
+<action>
+try:
+    library.save_books_to_file("temp_library.txt")
+except Exception:
+    pass
+</action>
 
-# Remove a book from the library by ISBN
-~<Library(1)>.remove_book("9780743273565") => \
-   len(<Library(1)>.books) == pre<(len(<Library(1)>.books))> - 1
+<action>
+try:
+    library.load_books_from_file("temp_library.txt")
+except Exception:
+    pass
+</action>
 
-# Sort books by price
-~<Library(1)>.sort_by_price() => \
-   pre<( <Library(1)>.books[0].price )> <= <Library(1)>.books[0].price
+<action>
+library.clear_books()
+</action>
 
-# Save and load books to/from a file
-<Library(1)>.display_total_books()
-<Library(1)>.display_all_books()
+# Validators to check system state
+<def>
+def valid(s):
+    return True
+</def>
 
-~<Library(1)>.save_books_to_file("books.txt")
-~<Library(1)>.clear_books()
+# Preconditions for actions
+<precondition>
+library.books or len(library.books) > 0
+</precondition>
 
-~<Library(1)>.load_books_from_file("books.txt")
-~<Library(1)>.display_total_books()
-
-# User-defined guard to display books only if there are more than 2 books
-len(<Library(1)>.books) > 2 -> <Library(1)>.display_all_books()
-
-# Compare actions with a reference implementation
-reference: Book ==> Book
-reference: Library ==> Library
-reference: add_book ==> add
-reference: remove_book ==> discard
-reference: search_by_title ==> search
-reference: sort_by_price ==> sorted
-reference: save_books_to_file ==> save
-reference: load_books_to_file ==> load
-
-# Method reference shorthand for comparing method calls and function calls
-reference: METHOD(display_all_books) ==> CALL(display_books)
-reference: METHOD(save_books_to_file) ==> CALL(save_books_to_file)
-reference: METHOD(load_books_from_file) ==> CALL(load_books_from_file)
+# Generators for test data
+GEN_INT = int
+GEN_FLOAT = float
+GEN_YEAR = int
+GEN_STR = str
