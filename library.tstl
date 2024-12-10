@@ -1,115 +1,84 @@
-# Import the classes to be tested
-from library import Library, Book
+@import library
 
-# Initialization and shared state
-library = None
-books_added = 0
+<@
+from random import choice
 
-def init_library():
-    """Initialize the library and reset state variables."""
-    global library, books_added
-    library = Library()
-    books_added = 0
+# Helper function to generate random strings
+def random_string(length=5):
+    import string
+    import random
+    return ''.join(random.choices(string.ascii_letters, k=length))
+@>
 
-# Actions
-def add_book(title: str, author: str, isbn: str, year: int, price: float):
-    """Add a book to the library."""
-    global books_added
-    book = Book(title, author, isbn, year, price)
-    library.add_book(book)
-    books_added += 1
+# Initialize pools
+pool: <library.Library> 1 OPAQUE
+pool: <library.Book> 5 OPAQUE
+pool: <str> 10
+pool: <int> 5
+pool: <float> 5
 
-def remove_book(isbn: str):
-    """Remove a book by its ISBN."""
-    global books_added
-    library.remove_book(isbn)
-    books_added = max(0, books_added - 1)
+# Initialize properties to check after each step
+property: len(<library.Library>.books) >= 0
+property: all(isinstance(book, library.Book) for book in <library.Library>.books)
 
-def search_books_by_title(title: str):
-    """Search for books by title."""
-    try:
-        books = library.search_by_title(title)
-        assert all(isinstance(book, Book) for book in books)
-    except Exception as exc:
-        print(f"Exception during search_books_by_title: {exc}")
+# Initialize actions
+# Create a Library object
+<library.Library> := library.Library()
 
-def search_books_by_author(author: str):
-    """Search for books by author."""
-    try:
-        books = library.search_by_author(author)
-        assert all(isinstance(book, Book) for book in books)
-    except Exception as exc:
-        print(f"Exception during search_books_by_author: {exc}")
+# Generate random strings
+<str> := CALL(random_string)
 
-def display_all_books():
-    """Display all books in the library."""
-    try:
-        library.display_all_books()
-    except Exception as exc:
-        print(f"Exception during display_all_books: {exc}")
+# Generate random integers (years)
+<int> := <[1900..2023]>
 
-def sort_books_by_price():
-    """Sort books by their price."""
-    try:
-        library.sort_by_price()
-    except Exception as exc:
-        print(f"Exception during sort_books_by_price: {exc}")
+# Generate random floats (prices)
+<float> := <[1.0..100.0]>
 
-def sort_books_by_year():
-    """Sort books by their publication year."""
-    try:
-        library.sort_by_year()
-    except Exception as exc:
-        print(f"Exception during sort_books_by_year: {exc}")
+# Create a Book object
+<library.Book> := library.Book(<str>, <str>, <str>, <int>, <float>)
 
-def display_total_books():
-    """Display the total number of books."""
-    try:
-        total = len(library.books)
-        assert total == books_added
-        library.display_total_books()
-    except Exception as exc:
-        print(f"Exception during display_total_books: {exc}")
+# Add a book to the library
+<library.Library>.add_book(<library.Book>)
 
-def clear_all_books():
-    """Clear all books from the library."""
-    global books_added
-    try:
-        library.clear_books()
-        books_added = 0
-    except Exception as exc:
-        print(f"Exception during clear_all_books: {exc}")
+# Remove a book by ISBN
+<library.Library>.remove_book(<library.Book>.isbn)
 
-def save_books_to_file(filename: str):
-    """Save all books to a file."""
-    try:
-        library.save_books_to_file(filename)
-    except Exception as exc:
-        print(f"Exception during save_books_to_file: {exc}")
+# Search books by title
+<library.Library>.search_by_title(<str>)
 
-def load_books_from_file(filename: str):
-    """Load books from a file."""
-    try:
-        library.load_books_from_file(filename)
-    except Exception as exc:
-        print(f"Exception during load_books_from_file: {exc}")
+# Search books by author
+<library.Library>.search_by_author(<str>)
 
-def display_book_by_isbn(isbn: str):
-    """Display details of a book by its ISBN."""
-    try:
-        book = library.display_book_by_isbn(isbn)
-        if book:
-            assert isinstance(book, Book)
-    except Exception as exc:
-        print(f"Exception during display_book_by_isbn: {exc}")
+# Sort books by price
+<library.Library>.sort_by_price()
 
-def update_book_details(isbn: str, title: str = None, author: str = None, year: int = None, price: float = None):
-    """Update a book's details."""
-    try:
-        book = Book(title or "", author or "", isbn, year or 0, price or 0.0)
-        library.update_book_details(isbn, book)
-    except Exception as exc:
-        print(f"Exception during update_book_details: {exc}")
+# Sort books by year
+<library.Library>.sort_by_year()
 
-# Initial action to set up the state
-init_library()
+# Display all books
+<library.Library>.display_all_books()
+
+# Save books to a file
+<library.Library>.save_books_to_file("test_library.txt")
+
+# Load books from a file
+<library.Library>.load_books_from_file("test_library.txt")
+
+# Display a book by ISBN
+<library.Library>.display_book_by_isbn(<library.Book>.isbn)
+
+# Clear all books
+<library.Library>.clear_books()
+
+# Display total books
+<library.Library>.display_total_books()
+
+# Update book details
+<library.Library>.update_book_details(
+    <library.Book>.isbn,
+    library.Book(<str>, <str>, <str>, <int>, <float>)
+)
+
+# Properties for validation after actions
+property: len(<library.Library>.books) >= 0
+property: all(isinstance(book, library.Book) for book in <library.Library>.books)
